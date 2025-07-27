@@ -169,3 +169,110 @@ Then add tracking time + clicks.
 
 Finally build dashboard.
 
+🧩 YouTube Interest Filter — Chrome Extension
+This Chrome Extension customizes a user's YouTube homepage based on their interests, which are stored and managed via the Detoxify backend.
+
+📌 How It Works
+User logs in to the Detoxify Dashboard
+
+User selects or enters their interests.
+
+Interests are saved to the backend via POST /api/user/interests.
+
+Chrome Extension is installed and activated
+
+It loads automatically when the user visits https://www.youtube.com.
+
+Extension fetches user interests from backend
+
+Using a stored userId or auth token.
+
+Example endpoint: GET /api/user/interests/:userId.
+
+Content script runs on YouTube
+
+Grabs video titles from the homepage.
+
+Hides any videos that do not match the user’s interests.
+
+📁 Folder Structure
+arduino
+Copy
+Edit
+youtube-extension/
+├── manifest.json
+├── content.js
+├── background.js (optional)
+├── popup.html (optional UI)
+└── README.md
+⚙️ Setup Instructions
+1. Store userId in Chrome Storage
+In your popup or login logic, store the user ID:
+
+js
+Copy
+Edit
+chrome.storage.local.set({ userId: "6880ecbf2dc73d1fc341f20a" });
+2. Content Script (content.js)
+js
+Copy
+Edit
+(async () => {
+  const { userId } = await chrome.storage.local.get("userId");
+
+  const response = await fetch(`https://your-backend.com/api/user/interests/${userId}`);
+  const { interests } = await response.json();
+
+  const cards = document.querySelectorAll('ytd-rich-item-renderer');
+  cards.forEach(card => {
+    const title = card.querySelector('h3')?.innerText?.toLowerCase() || '';
+    const matches = interests.some(i => title.includes(i.toLowerCase()));
+    if (!matches) card.style.display = 'none';
+  });
+})();
+3. Manifest File (manifest.json)
+json
+Copy
+Edit
+{
+  "manifest_version": 3,
+  "name": "YouTube Interest Filter",
+  "version": "1.0",
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.youtube.com/*", "https://your-backend.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/"],
+      "js": ["content.js"]
+    }
+  ]
+}
+🚀 Features Planned
+✅ Filter homepage videos
+
+✅ Backend-driven interest filtering
+
+🔒 Secure login integration
+
+📊 Logging video views & time spent
+
+🧠 Learning progress stats
+
+🎯 Future: Filter related videos, shorts, etc.
+
+🧠 Requirements
+Chrome browser (extension dev mode)
+
+Detoxify backend running (/api/user/interests/:userId)
+
+MongoDB + Express API
+
+YouTube DOM structure (uses ytd-rich-item-renderer)
+
+👨‍💻 Developer Notes
+You don’t need YouTube API.
+
+All filtering is DOM-based.
+
+Extension works client-side using your backend's data.
+

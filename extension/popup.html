@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Detoxify Setup</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 10px;
+      width: 250px;
+    }
+    input, label {
+      width: 100%;
+      margin: 5px 0;
+      padding: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h3>Setup Auth</h3>
+  <input id="userId" placeholder="Enter User ID" />
+  <input id="token" placeholder="Enter JWT Token" />
+  <label>
+    <input type="checkbox" id="toggleSwitch" />
+    Detoxify ON/OFF
+  </label>
+  <button id="save">Save</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>

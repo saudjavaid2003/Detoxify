@@ -1,40 +1,51 @@
+const fs = require('fs');
+const https = require('https');
 const express = require('express');
-const app = express();
 const env = require('dotenv');
 const cors = require('cors');
+
+// Load env variables
+env.config();
+
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const todoRoutes = require('./routes/todo.routes');
 const trackingRoutes = require('./routes/tracking.routes');
-// Load environment variables
-env.config();
 
-// DB connection
+// DB Connection
 const dbconnection = require('./config/db');
-dbconnection(); // ✅ Call the function to connect to MongoDB
+dbconnection();
+
+const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: '*', // Allow all origins for development; adjust in production
+    origin: '*', // Allow all origins for development
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
 
-// Test route
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/todo", todoRoutes);
 app.use("/api/tracking", trackingRoutes);
 
-app.use
 app.get('/', (req, res) => {
     console.log('Server is running');
-    res.send('Welcome to Detoxify API');
+    res.send('Welcome to Detoxify API (HTTPS)');
 });
-// Start server
+
+// Read SSL Certificate and Key
+const sslOptions = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+};
+
+// Start HTTPS Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+https.createServer(sslOptions, app).listen(PORT, () => {
+    console.log(`✅ HTTPS Server is running at https://localhost:${PORT}`);
 });

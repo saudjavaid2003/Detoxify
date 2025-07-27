@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Interest Filter",
+  "description": "Filters YouTube homepage videos based on user interests stored in the Detoxify backend.",
+  "version": "1.0",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://localhost:5000/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Detoxify Extension"
+  }
+}
