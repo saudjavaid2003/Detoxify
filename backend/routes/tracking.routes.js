@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const protect = require('../middlewares/authMiddleware');
+const protect = require('../middlewares/auth.middleware');
 
 const {
   logVideoView,
@@ -9,7 +9,7 @@ const {
   getDailyStats,
   getLearningProgress,
   deleteLog,
-} = require('../controllers/trackingController');
+} = require('../controllers/tracking.controller');
 
 // Save a video click & time spent
 router.post('/', protect, logVideoView);

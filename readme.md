@@ -411,4 +411,5 @@ A polished React dashboard template?
 
 Chrome extension zip upload instructions?
 
-Just say the word — I’ll generate it right away.
+Just say the word — I’ll generate it right away.#   D e t o x i f y  
+ 
