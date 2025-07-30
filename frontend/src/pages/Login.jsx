@@ -1,0 +1,69 @@
+import React, { useState } from 'react';
+
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // TODO: API call here
+    alert(`Logging in with ${email}`);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-tr from-purple-700 via-indigo-600 to-blue-500 flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white bg-opacity-90 rounded-3xl shadow-xl p-10">
+        <h2 className="text-3xl font-extrabold text-gray-900 mb-8 text-center">
+          Welcome Back
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition"
+          >
+            Log In
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-gray-600">
+          Don't have an account?{' '}
+          <a href="/register" className="text-indigo-600 font-semibold hover:underline">
+            Sign Up
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
