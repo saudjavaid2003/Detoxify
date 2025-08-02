@@ -6,7 +6,9 @@ import {
   LogOut,
   BarChart2,
 } from 'lucide-react';
-import avatar from '../assets/avatar.png'; // Use cartoon-style avatar
+import avatar from '../assets/avatar.png';
+import InterestManager from '../components/InterestManager'; // 🔥 Adjust path as needed
+import TodoSection from '../components/TodoSection';
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -19,38 +21,50 @@ const StudentDashboard = () => {
   };
 
   const renderContent = () => {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Interests */}
-        <div className="bg-gradient-to-br from-[#1f1c2c] to-[#928DAB] text-white p-6 rounded-2xl shadow-xl hover:scale-105 transition duration-300">
-          <h2 className="text-xl font-bold mb-4">🎯 Your Interests</h2>
-          <ul className="space-y-2 text-sm font-light">
-            <li className="bg-white bg-opacity-10 px-3 py-2 rounded">Game Development</li>
-            <li className="bg-white bg-opacity-10 px-3 py-2 rounded">Motion Graphics</li>
-            <li className="bg-white bg-opacity-10 px-3 py-2 rounded">Ethical Hacking</li>
-          </ul>
-        </div>
+    switch (activeTab) {
+      case 'interests':
+        return <InterestManager />;
 
-        {/* Todos */}
-        <div className="bg-gradient-to-br from-[#232526] to-[#414345] text-white p-6 rounded-2xl shadow-xl hover:scale-105 transition duration-300">
-          <h2 className="text-xl font-bold mb-4">✅ Today’s Todos</h2>
-          <ul className="space-y-2 text-sm font-light">
-            <li className="flex items-center">🛠️ <span className="ml-2">Fix UI Bugs</span></li>
-            <li className="flex items-center">📖 <span className="ml-2">Read Next.js Docs</span></li>
-            <li className="flex items-center">📩 <span className="ml-2">Send report to mentor</span></li>
-          </ul>
-        </div>
-
-        {/* Tracking */}
-        <div className="bg-gradient-to-br from-[#000428] to-[#004e92] text-white p-6 rounded-2xl shadow-xl hover:scale-105 transition duration-300">
-          <h2 className="text-xl font-bold mb-4">📊 Task Progress</h2>
-          <div className="bg-white bg-opacity-30 w-full h-4 rounded-full">
-            <div className="bg-white h-4 rounded-full w-[65%] animate-pulse"></div>
+      case 'todos':
+        return (
+          <div className="p-4 text-lg text-gray-300">
+            <h2 className="text-2xl font-semibold mb-4">Your Todos</h2>
+            return <TodoSection/>
           </div>
-          <p className="text-sm mt-2">65% completed</p>
-        </div>
-      </div>
-    );
+        );
+
+      case 'tracking':
+        return (
+          <div className="p-4 text-lg text-gray-300">
+            <h2 className="text-2xl font-semibold mb-4">Task Tracking</h2>
+            <p>Progress tracking will be shown here.</p>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="p-4 text-gray-300 space-y-6">
+            <h2 className="text-2xl font-semibold">Dashboard Overview</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-[#1c1c2e] p-6 rounded-lg">
+                <h3 className="font-semibold mb-2">Game Development</h3>
+                <p className="text-sm text-gray-400">Learning Unity and Unreal Engine basics.</p>
+              </div>
+
+              <div className="bg-[#1c1c2e] p-6 rounded-lg">
+                <h3 className="font-semibold mb-2">Motion Graphics</h3>
+                <p className="text-sm text-gray-400">Exploring After Effects and animation principles.</p>
+              </div>
+
+              <div className="bg-[#1c1c2e] p-6 rounded-lg">
+                <h3 className="font-semibold mb-2">Ethical Hacking</h3>
+                <p className="text-sm text-gray-400">Hands-on with Kali Linux and web pentesting.</p>
+              </div>
+            </div>
+          </div>
+        );
+    }
   };
 
   return (
@@ -90,7 +104,10 @@ const StudentDashboard = () => {
       <main className="flex-1 flex flex-col">
         {/* Header */}
         <header className="flex items-center justify-between bg-[#1c1c1e] px-8 py-4 shadow-md">
-          <h1 className="text-2xl font-semibold">Welcome, {user.name}!</h1>
+          <div>
+            <p className="text-sm text-gray-400">Logged in as</p>
+            <h1 className="text-xl font-bold text-white">{user.name}</h1>
+          </div>
           <div className="relative">
             <img
               src={user.avatar}
@@ -112,7 +129,7 @@ const StudentDashboard = () => {
           </div>
         </header>
 
-        {/* Content */}
+        {/* Dynamic Content */}
         <div className="p-8">{renderContent()}</div>
       </main>
     </div>
