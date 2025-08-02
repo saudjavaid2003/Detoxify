@@ -22,7 +22,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: '*', // Allow all origins for development
+    origin: 'http://localhost:5173', // ✅ Corrected
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));

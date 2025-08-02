@@ -1,13 +1,32 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: API call here
-    alert(`Logging in with ${email}`);
+    setLoading(true);
+
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/login', {
+        email,
+        password,
+      });
+
+      console.log('Login Success:', res.data);
+      alert('Login successful!');
+      // Example: Store token or redirect
+      localStorage.setItem('token', res.data.token);
+      // window.location.href = '/dashboard'; // uncomment when ready
+    } catch (error) {
+      console.error('Login failed:', error.response?.data || error.message);
+      alert(error.response?.data?.message || 'Login failed. Try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,9 +68,10 @@ const Login = () => {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition"
           >
-            Log In
+            {loading ? 'Logging in...' : 'Log In'}
           </button>
         </form>
 
