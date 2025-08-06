@@ -9,6 +9,7 @@ import {
 import avatar from '../assets/avatar.png';
 import InterestManager from '../components/InterestManager'; // 🔥 Adjust path as needed
 import TodoSection from '../components/TodoSection';
+import TrackingStats from '../components/TrackingStats';
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -37,7 +38,7 @@ const StudentDashboard = () => {
         return (
           <div className="p-4 text-lg text-gray-300">
             <h2 className="text-2xl font-semibold mb-4">Task Tracking</h2>
-            <p>Progress tracking will be shown here.</p>
+        return <TrackingStats/>
           </div>
         );
 

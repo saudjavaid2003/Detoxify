@@ -27,6 +27,6 @@ router.get('/daily/:userId', getDailyStats);
 router.get('/progress/:userId', getLearningProgress);
 
 // Delete a log entry (optional)
-router.delete('/:logId', deleteLog);
+router.delete('/logs/:logId', deleteLog);
 
 module.exports = router;

@@ -1,93 +1,123 @@
 (async () => {
-  // 1. Configuration and Initial Checks
-  const { userId, token, detoxifyEnabled } = await chrome.storage.local.get([
-    'userId', 'token', 'detoxifyEnabled'
+  // Get user settings from storage
+  const { userId, token, trackingEnabled } = await chrome.storage.local.get([
+    'userId', 'token', 'trackingEnabled'
   ]);
 
-  if (!userId || !token || !detoxifyEnabled) {
-    return console.log("Detoxify: Disabled or missing credentials");
+  if (!userId || !token || !trackingEnabled) {
+    return console.log("YouTube Tracker: Disabled or missing credentials");
   }
 
-  // 2. Fetch Interests (now using HTTP)
-  let interests = [];
-  try {
-    const response = await fetch('http://localhost:5000/api/user/interests', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    interests = (await response.json()).interests || [];
-    if (!interests.length) return;
-  } catch (error) {
-    console.error("Detoxify: Failed to fetch interests", error);
-    return;
-  }
-
-  // 3. Filter Logic
-  const filterVideos = () => {
-    const container = document.querySelector('ytd-rich-grid-renderer');
-    if (!container) return;
-
-    const cards = Array.from(container.querySelectorAll('ytd-rich-item-renderer'));
-    if (cards.length === 0) return;
-
-    let visibleCount = 0;
-
-    cards.forEach(card => {
-      card.style.display = 'none';
-    });
-
-    cards.forEach(card => {
-      const titleElement = card.querySelector('#video-title');
-      const title = titleElement?.textContent?.toLowerCase() || '';
-
-      const shouldShow = interests.some(interest =>
-        title.includes(interest.toLowerCase())
-      );
-
-      if (shouldShow) {
-        card.style.display = '';
-        visibleCount++;
+  // Track video views
+  const trackVideoView = async (videoTitle, videoUrl) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/tracking/log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          videoTitle,
+          videoUrl,
+          timeSpent: 0 // Will be updated when user leaves the video
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to log video');
       }
-    });
-
-    console.log(`Detoxify: Showing ${visibleCount} matching videos`);
-
-    if (visibleCount === 0) {
-      const message = document.createElement('div');
-      message.textContent = 'No videos match your current interests.';
-      message.style.cssText = `
-        color: #fff;
-        padding: 20px;
-        text-align: center;
-        font-size: 1.2rem;
-        width: 100%;
-      `;
-      container.prepend(message);
+      
+      console.log('YouTube Tracker: Video view logged');
+    } catch (error) {
+      console.error('YouTube Tracker: Error logging video', error);
     }
   };
 
-  // 4. Mutation Observer
-  let isFiltering = false;
-  const observer = new MutationObserver(() => {
-    if (isFiltering) return;
-    isFiltering = true;
-    setTimeout(() => {
-      filterVideos();
-      isFiltering = false;
-    }, 1000);
-  });
-
-  // 5. Initialize
-  const initialize = () => {
-    if (window.location.href.includes('/watch')) return;
-    observer.observe(document.body, { childList: true, subtree: true });
-    setTimeout(filterVideos, 3000);
+  // Update time spent when leaving video
+  const updateTimeSpent = async (videoTitle, videoUrl, timeSpent) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/tracking/update-time', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          videoTitle,
+          videoUrl,
+          timeSpent
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update time spent');
+      }
+      
+      console.log('YouTube Tracker: Time spent updated');
+    } catch (error) {
+      console.error('YouTube Tracker: Error updating time', error);
+    }
   };
 
-  if (document.readyState === 'complete') {
-    initialize();
-  } else {
-    window.addEventListener('load', initialize);
+  // Handle video page
+  if (window.location.href.includes('/watch')) {
+    const videoTitle = document.querySelector('h1.title yt-formatted-string')?.textContent;
+    const videoUrl = window.location.href.split('&')[0]; // Clean URL
+    
+    if (videoTitle && videoUrl) {
+      // Initial log when video loads
+      await trackVideoView(videoTitle, videoUrl);
+      
+      // Track time when leaving the video
+      let startTime = Date.now();
+      window.addEventListener('beforeunload', () => {
+        const timeSpent = Math.floor((Date.now() - startTime) / 1000 / 60); // in minutes
+        updateTimeSpent(videoTitle, videoUrl, timeSpent);
+      });
+    }
   }
 
-  window.addEventListener('yt-navigate-finish', initialize);
+  // Filter homepage based on interests (optional)
+  const filterHomepage = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/user/interests', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const { interests } = await response.json();
+      
+      if (!interests?.length) return;
+      
+      const container = document.querySelector('ytd-rich-grid-renderer');
+      if (!container) return;
+      
+      const cards = Array.from(container.querySelectorAll('ytd-rich-item-renderer'));
+      if (!cards.length) return;
+      
+      cards.forEach(card => {
+        const title = card.querySelector('#video-title')?.textContent?.toLowerCase() || '';
+        const shouldShow = interests.some(interest => 
+          title.includes(interest.toLowerCase())
+        );
+        
+        card.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) {
+          card.style.outline = '2px solid #3b82f6';
+          card.style.borderRadius = '8px';
+        }
+      });
+    } catch (error) {
+      console.error('YouTube Tracker: Error filtering homepage', error);
+    }
+  };
+
+  // Initialize homepage filtering
+  if (!window.location.href.includes('/watch')) {
+    const observer = new MutationObserver(() => {
+      filterHomepage();
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+    setTimeout(filterHomepage, 3000);
+  }
 })();
