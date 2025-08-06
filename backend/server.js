@@ -1,5 +1,3 @@
-const fs = require('fs');
-const https = require('https');
 const express = require('express');
 const env = require('dotenv');
 const cors = require('cors');
@@ -7,6 +5,7 @@ const cors = require('cors');
 // Load env variables
 env.config();
 
+// Import routes
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const todoRoutes = require('./routes/todo.routes');
@@ -22,7 +21,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: 'http://localhost:5173', // ✅ Corrected
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
@@ -35,17 +34,11 @@ app.use("/api/tracking", trackingRoutes);
 
 app.get('/', (req, res) => {
     console.log('Server is running');
-    res.send('Welcome to Detoxify API (HTTPS)');
+    res.send('Welcome to Detoxify API (HTTP)');
 });
 
-// Read SSL Certificate and Key
-const sslOptions = {
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
-};
-
-// Start HTTPS Server
+// Start HTTP server
 const PORT = process.env.PORT || 5000;
-https.createServer(sslOptions, app).listen(PORT, () => {
-    console.log(`✅ HTTPS Server is running at https://localhost:${PORT}`);
+app.listen(PORT, () => {
+    console.log(`✅ HTTP Server is running at http://localhost:${PORT}`);
 });

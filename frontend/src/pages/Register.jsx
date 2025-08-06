@@ -39,7 +39,7 @@ const Register = () => {
       const data = { email, password };
 
       const res = await axios.post(
-        "https://localhost:5000/api/auth/register",
+        "http://localhost:5000/api/auth/register",
         data,
         { withCredentials: true }
       );
